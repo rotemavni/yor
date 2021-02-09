@@ -1,20 +1,19 @@
 # Yor
+[![Maintained by Bridgecrew.io](https://img.shields.io/badge/maintained%20by-bridgecrew.io-blueviolet)](https://bridgecrew.io/?utm_source=github&utm_medium=organic_oss&utm_campaign=yor)
+[![build status](https://github.com/bridgecrewio/yor/workflows/build/badge.svg)](https://github.com/bridgecrewio/yor/actions?query=workflow%3Abuild)
+[![security status](https://github.com/bridgecrewio/yor/workflows/security/badge.svg)](https://github.com/bridgecrewio/yor/actions?query=event%3Apush+branch%3Amaster+workflow%3Asecurity) 
+[![code_coverage](https://raw.githubusercontent.com/bridgecrewio/yor/master/coverage.svg?sanitize=true)](https://github.com/bridgecrewio/yor/actions?query=workflow%3Acoverage) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/bridgecrewio/yor)](https://goreportcard.com/report/github.com/bridgecrewio/yor)
+[![Terraform Version](https://img.shields.io/badge/tf-%3E%3D0.12.0-blue.svg)](#)
+[![slack-community](https://slack.bridgecrew.io/badge.svg)](https://slack.bridgecrew.io/?utm_source=github&utm_medium=organic_oss&utm_campaign=yor)
 
-Automated IaC tagging using external sources of data.
-
-Yor applies IaC tags based on git data so that you can consistently attribute changes to cloud resources managed using infrastructure-as-code. Yor is currently built to tag based on local or remote Git data. It is built 
 
 
+Automated IaC tagging for managing cloud resources.
 
-## Features
+Yor is a tagging automation utility for infrastructure-as-code. It uses Git-Blame data to tag resource blocks managed in IaC, with CMDB-like information such as repo, commit, author, etc.
 
-* Yor collects data from [git-blame](https://git-scm.com/docs/git-blame) and enables mapping individual resources to specific commits. It can be run automatically  
-* ```yor_trace``` tag enables full attribution between build time and run time resources. 
-* ```git_*``` tags  connect cloud resources to individual git commits and enable assigning clear ownership between developers and the resources they routinely change.
-
- 
-
-### Supported tags
+## Supported tags
 
 ```
 yor_trace = "842fa55e-c0f8-4f79-a56d-a046a24d8e08"
@@ -26,8 +25,6 @@ git_last_modified_At = "2020-03-28 21:42:46 +0000 UTC"
 git_last_modified_by = "schosterbarak@gmail.com"
 git_modifiers = "schosterbarak/baraks" # These are extracted from the emails, everything before the @ sign. Can be done for modified_by tag as well
 ```
-
-
 
 ## **Table of contents**
 
@@ -44,8 +41,6 @@ On MacOS
 ```sh
 brew install yor
 ```
-
-
 
 ### Usage
 
@@ -75,14 +70,12 @@ yor -d. --skip-tag
 
 ## Contributing
 
-Contribution is welcomed! 
+Contribution is welcomed!
 
-We are working on extending Yor and adding more parsers (to support additional IaC frameworks) and more runners (to tag using other contextual data).
 
 ## Disclaimer
 
 `yor` does not save, publish or share with anyone any identifiable customer information.  
-No identifiable customer information is used to query Bridgecrew's publicly accessible guides.
 
 ## Support
 
