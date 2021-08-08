@@ -42,7 +42,6 @@ func main() {
 
 
 
-
 func listTagGroupsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-tag-groups",
