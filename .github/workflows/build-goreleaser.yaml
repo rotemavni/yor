@@ -1,9 +1,9 @@
-name: build-goreleaser
+name: build
 
 on:
   push:
     branches:
-      - release-changes
+      - main
     paths-ignore:
       - 'docs/**'
       - 'INTHEWILD.md'
@@ -16,16 +16,70 @@ permissions:
   contents: write
 
 jobs:
+  create-release:
+    runs-on: [self-hosted, public, linux, x64]
+    outputs:
+      version: ${{ steps.version.outputs.new_tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: version
+        uses: anothrNick/github-tag-action@1.26.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          RELEASE_BRANCHES: main
+          DEFAULT_BUMP: patch
+        id: version
+      - name: release
+        uses: actions/create-release@v1
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.new_tag }}
+          tag_name: ${{ steps.version.outputs.new_tag }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Update go reportcard
+        uses: creekorful/goreportcard-action@v1.0
+  linux-windows-matrix:
+    needs:
+      - create-release
+    name: Release Go Binary
+    runs-on: [self-hosted, public, linux, x64]
+    strategy:
+      matrix:
+        # build and publish in parallel: linux/386, linux/amd64, windows/386, windows/amd64, darwin/386, darwin/amd64
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64]
+        exclude:
+          - goarch: 386
+            goos: darwin
+    steps:
+      - uses: actions/checkout@v2
+      - name: version
+        run: |
+          new_tag=${{ needs.create-release.outputs.version }}
+          echo "new tag: $new_tag"
+          echo "package common" > src/common/version.go
+          echo "" >> src/common/version.go
+          echo "const Version = \"$new_tag\"" >> src/common/version.go
+      - uses: wangyoucao577/go-release-action@v1.14
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: "https://dl.google.com/go/go1.13.15.linux-amd64.tar.gz"
+          binary_name: "yor"
+          extra_files: LICENSE README.md
+          release_tag: ${{ needs.create-release.outputs.version }}
+
   formula:
     name: Update Homebrew formula
     runs-on: [self-hosted, public, linux, x64]
     steps:
-      - name: Install Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.13
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Update the Homebrew formula with latest release
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -33,4 +87,12 @@ jobs:
           args: release --rm-dist --skip-publish=false --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
-          GORELEASER_CURRENT_TAG: 0.1.85
+          GORELEASER_CURRENT_TAG: ${{ steps.version.outputs.new_tag }}
+  update-bridgecrew-projects:
+    needs: publish-dockerhub
+    runs-on: [self-hosted, public, linux, x64]
+    steps:
+      - name: update on yor release
+        run: |
+          curl -XPOST -H "Authorization: token ${{ secrets.PAT }}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/bridgecrewio/yor-action/dispatches --data '{"event_type": "build"}'
+          curl -XPOST -H "Authorization: token ${{ secrets.PAT }}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/bridgecrewio/yor-choco/dispatches --data '{"event_type": "build"}'
