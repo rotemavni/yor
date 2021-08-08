@@ -17,12 +17,16 @@ permissions:
 
 jobs:
   prepare:
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.13
-    - name: Checkout code
-      uses: actions/checkout@v2
+    runs-on: [ self-hosted, public, linux, x64 ]
+    outputs:
+      version: ${{ steps.version.outputs.new_tag }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.13
+      - name: Checkout code
+        uses: actions/checkout@v2
   create-release:
     runs-on: [self-hosted, public, linux, x64]
     outputs:
