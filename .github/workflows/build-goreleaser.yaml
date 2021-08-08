@@ -17,8 +17,7 @@ permissions:
 
 jobs:
   prepare:
-    runs-on: [self-hosted, 
-M-C02C70X7LVDP, macOS, x64]
+    runs-on: [self-hosted, M-C02C70X7LVDP, macOS, x64]
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
@@ -27,8 +26,7 @@ M-C02C70X7LVDP, macOS, x64]
       - name: Checkout code
         uses: actions/checkout@v2
   create-release:
-    runs-on: [self-hosted, 
-M-C02C70X7LVDP, macOS, x64]
+    runs-on: [self-hosted, M-C02C70X7LVDP, macOS, x64]
     outputs:
       version: ${{ steps.version.outputs.new_tag }}
     steps:
@@ -59,8 +57,7 @@ M-C02C70X7LVDP, macOS, x64]
     needs:
       - create-release
     name: Release Go Binary
-    runs-on: [self-hosted, 
-M-C02C70X7LVDP, macOS, x64]
+    runs-on: [self-hosted, M-C02C70X7LVDP, macOS, x64]
     strategy:
       matrix:
         # build and publish in parallel: linux/386, linux/amd64, windows/386, windows/amd64, darwin/386, darwin/amd64
@@ -90,8 +87,7 @@ M-C02C70X7LVDP, macOS, x64]
 
   formula:
     name: Update Homebrew formula
-    runs-on: [self-hosted, 
-M-C02C70X7LVDP, macOS, x64]
+    runs-on: [self-hosted, M-C02C70X7LVDP, macOS, x64]
     steps:
       - name: Update the Homebrew formula with latest release
         uses: goreleaser/goreleaser-action@v2
